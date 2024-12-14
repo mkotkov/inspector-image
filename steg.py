@@ -7,7 +7,12 @@ def extract_steg_message(image_path):
         if img is None or img.size == 0:
             raise ValueError("Image is empty or not readable.")
 
-        binary_message = np.bitwise_and(img.flatten(), 1)
+        if len(img.shape) == 3:  
+            channel = img[:, :, 0]
+        else:
+            channel = img
+
+        binary_message = np.bitwise_and(channel.flatten(), 1)
         byte_chunks = [
             binary_message[i:i + 8] for i in range(0, len(binary_message), 8)
         ]
@@ -20,6 +25,7 @@ def extract_steg_message(image_path):
         hidden_message = ''.join([f'{b:02x}' for b in byte_list])
 
         return hidden_message
+    
     except Exception as e:
         print(f"Error extracting steg message: {e}")
         return None
